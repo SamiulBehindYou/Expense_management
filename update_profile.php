@@ -6,15 +6,20 @@ if(isset($_POST['submit'])){
     $id = $_SESSION['user_id'];
     $password = $_POST['password'];
     // $after_implode = explode('',$password);
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    if(!empty($password)){
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
-    $update = "UPDATE users SET password = '$password_hash' WHERE id = $id";
+        $update = "UPDATE users SET password = '$password_hash' WHERE id = $id";
 
-    if($conn->query($update)){
-        $_SESSION['updated_success'] = 'Password successfully updated!';
+        if($conn->query($update)){
+            $_SESSION['updated_success'] = 'Password successfully updated!';
+        }
+        else{
+            $_SESSION['updated_error'] = 'Something went wrong!';
+        }
     }
     else{
-        $_SESSION['updated_error'] = 'Something went wrong!';
+        $_SESSION['updated_error']= 'Input password!';
     }
     
 }
@@ -43,7 +48,12 @@ if(isset($_POST['submit'])){
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Input new password!">
+                            <input type="password" required name="password" class="form-control" placeholder="Input new password!">
+                            <?php if(isset($_SESSION['updated_error'])){ ?>
+                                <strong class="alert alert-danger">
+                                    <?= $_SESSION['updated_error'] ?>
+                                </strong>
+                            <?php } unset($_SESSION['updated_error']) ?>
                         </div>
                         <div class="mb-0">
                             <input type="submit" name="submit" class="btn btn-info">

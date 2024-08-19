@@ -34,11 +34,11 @@ require 'header.php';
             while($row = $result->fetch_assoc()) {
                 $sl+=1?>					
         <tr>
-        <th scope="row"><?= $sl ?></th>
-        <td><?= $row["user"] ?></td>
-        <td><?= $row["money"] ?></td>
-        <td><?= $row["description"] ?></td>
-        <td><?= $row["datetime"] ?></td>
+            <th width="5%" scope="row"><?= $sl ?></th>
+            <td width="10%"><?= $row["user"] ?></td>
+            <td width="10%"><?= $row["money"] ?></td>
+            <td width="55%"><?= $row["description"] ?></td>
+            <td width="20%"><?= $row["datetime"] ?></td>
         </tr>
         <?php 
             }

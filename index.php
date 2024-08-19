@@ -8,7 +8,7 @@ if (!isset($_SESSION['login_status'])){
 
 // Meal Lifetime expenses
 $per_head = 0;
-$meal = "SELECT id, user, money FROM m_account";
+$meal = "SELECT user, money, datetime FROM m_account";
 $result = $conn->query($meal);
 $meal_lifetime = 0;
 if ($result->num_rows > 0) {
@@ -17,7 +17,57 @@ if ($result->num_rows > 0) {
     }
     
     $per_head = $meal_lifetime / 3;
+
 } 
+
+// Meal Monthly
+$m_meal = "SELECT money, datetime FROM m_account WHERE MONTH(datetime) = MONTH(NOW())";
+$m_result = mysqli_query($conn, $m_meal);
+$meal_monthly = 0;
+foreach($m_result as $m){
+    $meal_monthly += $m['money']; //Calculating total ammount of each month!
+}
+
+if($meal_monthly == 0){
+    $meal_monthly = "No expenses on this month!";
+}else{
+    $meal_monthly = $meal_monthly." TK";
+}
+
+
+// Meal Today
+// $t_meal = "SELECT money, datetime FROM m_account ORDER BY id DESC LIMIT 1";
+$gd = getdate(); //getting todays current date
+
+if(strlen("$gd[mon]") == 1){  ////Making date 0000-0-0 to 0000-00-00
+    $ymd = "$gd[year]-0$gd[mon]-$gd[mday]";
+    if(strlen("$gd[mday]") == 1){
+        $ymd = "$gd[year]-0$gd[mon]-0$gd[mday]";
+    }
+}
+elseif(strlen("$gd[mday]") == 1){
+    $ymd = "$gd[year]-$gd[mon]-0$gd[mday]";
+    if(strlen("$gd[mon]") == 1){
+        $ymd = "$gd[year]-0$gd[mon]-0$gd[mday]";
+    }
+}
+else{
+    $ymd = "$gd[year]-$gd[mon]-$gd[mday]";
+}
+
+$t_meal = "SELECT money, datetime FROM m_account WHERE datetime LIKE '{$ymd}%'";
+
+$t_result = mysqli_query($conn, $t_meal);
+$meal_today = 0;
+foreach($t_result as $t){
+    $meal_today += $t['money'];
+}
+
+if($meal_today == 0){
+    $meal_today = "No expenses on this today!";
+}else{
+    $meal_today = $meal_today." TK";
+}
 
 
 // USER 1 Lifetime
@@ -102,13 +152,13 @@ if($r_balance < 0){
                             
                             ?>
 
-                                <label for="" class="form-label">Lifetime Cost: <?= $meal_lifetime ?></label>
+                                <label for="" class="form-label">Lifetime Cost: <?= $meal_lifetime ?> TK</label>
                             </div>
                             <div class="mb-3">
-                                <label for="" class="form-label">Monthly Cost: Comming soon!</label>
+                                <label for="" class="form-label">Monthly Cost: <?= $meal_monthly ?></label>
                             </div>
                             <div class="mb-3">
-                                <label for="" class="form-label">Todays Cost: Comming soon!</label>
+                                <label for="" class="form-label">Todays Cost: <?= $meal_today ?></label>
                             </div>
                             <div class="mb-3">
                                 <label>Add Money</label>
@@ -332,11 +382,11 @@ if($r_balance < 0){
                     while($row = $result->fetch_assoc()) {
                         $sl+=1?>					
                 <tr>
-                <th scope="row"><?= $sl ?></th>
-                <td><?= $row["user"] ?></td>
-                <td><?= $row["money"] ?></td>
-                <td><?= $row["description"] ?></td>
-                <td><?= $row["datetime"] ?></td>
+                <th width="5%" scope="row"><?= $sl ?></th>
+                <td width="10%"><?= $row["user"] ?></td>
+                <td width="10%"><?= $row["money"] ?></td>
+                <td width="55%"><?= $row["description"] ?></td>
+                <td width="20%"><?= $row["datetime"] ?></td>
                 </tr>
                 <?php 
                     }
